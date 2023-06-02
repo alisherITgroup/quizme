@@ -1,0 +1,256 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block content %}
+{% if user.is_superuser %}
+<div class="page-header d-print-none">
+  <div class="container-xl">
+    <div class="row g-2 align-items-center">
+      <div class="col">
+        <!-- Page pre-title -->
+        <h2 class="page-title">
+          Your questions
+        </h2>
+      </div>
+      <!-- Page title actions -->
+      <div class="col-auto ms-auto d-print-none">
+        <div class="btn-list">
+          <a href="#" class="btn btn-primary d-none d-sm-inline-block" data-bs-toggle="modal" data-bs-target="#modal-report">
+            <!-- Download SVG icon from http://tabler-icons.io/i/plus -->
+            <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M12 5l0 14" /><path d="M5 12l14 0" /></svg>
+            Create new quiz
+          </a>
+          <a href="#" class="btn btn-primary d-sm-none btn-icon" data-bs-toggle="modal" data-bs-target="#modal-report" aria-label="Create new report">
+            <!-- Download SVG icon from http://tabler-icons.io/i/plus -->
+            <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M12 5l0 14" /><path d="M5 12l14 0" /></svg>
+          </a>
+        </div>
+      </div>
+      <div class="modal modal-blur fade" id="modal-report" tabindex="-1" role="dialog" aria-hidden="true">
+        <form action="{% url 'create_quiz' %}" method="post">
+          {% csrf_token %}
+          <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content">
+              <div class="modal-header">
+                <h5 class="modal-title">New quiz</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+              </div>
+              <div class="modal-body">
+                <label for="name">Name</label>
+                <input type="text" name="name" id="name" class="form-control" placeholder="Quiz name"> <br>
+                <div class="row">
+                  <div class="col-md-6">
+                    <label for="sdate">Quiz start date</label>
+                    <input name="startdate" class="form-control mb-2 datepicker" data-mask="00/00/0000" data-mask-visible="true" placeholder="00/00/0000"autocomplete="off"/>
+                  </div>
+                  <div class="col-md-6">
+                    <label for="etime">Quiz start time</label>
+                    <input type="text" name="starttime" class="form-control" data-mask="00:00:00" data-mask-visible="true" placeholder="00:00:00"autocomplete="off">
+                  </div>
+                </div>
+                <div class="row">
+                  <div class="col-md-6">
+                    <label for="sdate">Quiz end date</label>
+                    <input name="enddate" class="form-control mb-2 datepicker" data-mask="00/00/0000" data-mask-visible="true" placeholder="00/00/0000"autocomplete="off"/> <br>
+                  </div>
+                  <div class="col-md-6">
+                    <label for="etime">Quiz end time</label>
+                    <input type="text" name="endtime" class="form-control" data-mask="00:00:00" data-mask-visible="true" placeholder="00:00:00"autocomplete="off">
+                  </div>
+                </div>
+                <div class="mb-3">
+                  <label class="form-label">Description</label>
+                  <textarea name="description" class="editor">
+                    <b>Your quiz description content here...</b>
+                  </textarea>
+                </div>
+                <div class="form-selectgroup-boxes row mb-3">
+                  <div class="col-lg-6">
+                    <label class="form-selectgroup-item">
+                      <input type="radio" name="type" value="public" class="form-selectgroup-input" checked required>
+                      <span class="form-selectgroup-label d-flex align-items-center p-3">
+                        <span class="me-3">
+                          <span class="form-selectgroup-check"></span>
+                        </span>
+                        <span class="form-selectgroup-label-content">
+                          <span class="form-selectgroup-title strong mb-1">Public</span>
+                          <span class="d-block text-muted">Your quiz will be public.</span>
+                        </span>
+                      </span>
+                    </label>
+                  </div>
+                  <div class="col-lg-6">
+                    <label class="form-selectgroup-item">
+                      <input type="radio" name="type" value="private" class="form-selectgroup-input" required>
+                      <span class="form-selectgroup-label d-flex align-items-center p-3">
+                        <span class="me-3">
+                          <span class="form-selectgroup-check"></span>
+                        </span>
+                        <span class="form-selectgroup-label-content">
+                          <span class="form-selectgroup-title strong mb-1">Private</span>
+                          <span class="d-block text-muted">Your quiz is visible only to you.</span>
+                        </span>
+                      </span>
+                    </label>
+                  </div>
+                </div>
+              </div>
+              <div class="modal-footer">
+                <a href="#" class="btn btn-danger" data-bs-dismiss="modal">
+                  Cancel
+                </a>
+                <button class="btn btn-primary ms-auto" type="submit">
+                  Save
+                </button>
+              </div>
+            </div>
+          </div>
+        </form>
+      </div>
+
+    </div>
+  </div>
+</div> <br>
+{% endif %}
+<script src="{% static 'dist/libs/tinymce/tinymce.min.js' %}" defer></script>
+<script>
+  // @formatter:off
+  document.addEventListener("DOMContentLoaded", function () {
+    let options = {
+      selector: '.editor',
+      height: 300,
+      menubar: false,
+      statusbar: false,
+      plugins: [
+        'advlist autolink lists link image charmap print preview anchor',
+        'searchreplace visualblocks code fullscreen',
+        'insertdatetime media table paste code help wordcount'
+      ],
+      toolbar: 'undo redo | formatselect | ' +
+        'bold italic backcolor | alignleft aligncenter ' +
+        'alignright alignjustify | bullist numlist outdent indent | ' +
+        'removeformat | media',
+      content_style: 'body { font-family: -apple-system, BlinkMacSystemFont, San Francisco, Segoe UI, Roboto, Helvetica Neue, sans-serif; font-size: 14px; -webkit-font-smoothing: antialiased; }'
+    }
+    if (localStorage.getItem("tablerTheme") === 'dark') {
+      options.skin = 'oxide-dark';
+      options.content_css = 'dark';
+    }
+    tinyMCE.init(options);
+  })
+  // @formatter:on
+</script>
+
+{% for quiz in quizzes %}
+  <div class="row">
+    <div class="col-md-12">
+      <div class="card h-100">
+        <div class="card-header">
+          <div>
+            <div class="row align-items-center">
+              <div class="col-auto">
+                <span class="avatar" style="background-image: url(./static/avatars/003m.jpg)"></span>
+              </div>
+              <div class="col">
+                <div class="card-title">{{quiz.name}}</div>
+                <div class="card-subtitle">{{quiz.author.username}}</div>
+              </div>
+            </div>
+          </div>
+          <div class="card-actions">
+            <div class="dropdown">
+              <a href="#" class="btn-action dropdown-toggle" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><!-- Download SVG icon from http://tabler-icons.io/i/dots-vertical -->
+                <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M12 12m-1 0a1 1 0 1 0 2 0a1 1 0 1 0 -2 0" /><path d="M12 19m-1 0a1 1 0 1 0 2 0a1 1 0 1 0 -2 0" /><path d="M12 5m-1 0a1 1 0 1 0 2 0a1 1 0 1 0 -2 0" /></svg>
+              </a>
+              <div class="dropdown-menu dropdown-menu-end">
+                <a class="dropdown-item" href="{% url 'quiz' quiz.id %}">View</a>
+                <a class="dropdown-item" href="{% url 'add_question' quiz.id %}">Add question</a>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="card-body">
+          <span class="text-primary fw-bold">Type: </span> 
+            {% if quiz.type == "private" %}
+            <span class="text-danger">{{quiz.type}} </span>
+            {% else %}
+            <span class="text-success">{{quiz.type}} </span>
+            {% endif %}
+          <br>
+          <span class="text-info">Description: {{quiz.description|safe}}</span>
+          <ul>
+            <li>Participants: {{quiz.count_users}}</li>
+            <li>Questions: {{quiz.count_questions}}</li>
+          </ul>
+          Password: {{quiz.password}} <br>
+          Token: {{quiz.token}} <br>
+          URL: <a href="{% url 'test' quiz.token %}">{{quiz.name}}</a>
+        </div>
+      </div>
+    </div>
+  </div> <br>
+{% endfor %}
+<script src="{% static 'dist/libs/litepicker/dist/litepicker.js' %}" defer></script>
+<script>
+  // @formatter:off
+  document.addEventListener("DOMContentLoaded", function () {
+    window.Litepicker && (new Litepicker({
+      element: document.querySelectorAll('.datepicker'),
+      buttonText: {
+        previousMonth: `<!-- Download SVG icon from http://tabler-icons.io/i/chevron-left -->
+  <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M15 6l-6 6l6 6" /></svg>`,
+        nextMonth: `<!-- Download SVG icon from http://tabler-icons.io/i/chevron-right -->
+  <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M9 6l6 6l-6 6" /></svg>`,
+      },
+    }));
+  });
+  // @formatter:on
+</script>
+<script>
+  // @formatter:off
+  document.addEventListener("DOMContentLoaded", function () {
+    window.Litepicker && (new Litepicker({
+      element: document.querySelectorAll('#datepicker-icon'),
+      buttonText: {
+        previousMonth: `<!-- Download SVG icon from http://tabler-icons.io/i/chevron-left -->
+  <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M15 6l-6 6l6 6" /></svg>`,
+        nextMonth: `<!-- Download SVG icon from http://tabler-icons.io/i/chevron-right -->
+  <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M9 6l6 6l-6 6" /></svg>`,
+      },
+    }));
+  });
+  // @formatter:on
+</script>
+<script>
+  // @formatter:off
+  document.addEventListener("DOMContentLoaded", function () {
+    window.Litepicker && (new Litepicker({
+      element: document.querySelectorAll('#datepicker-icon-prepend'),
+      buttonText: {
+        previousMonth: `<!-- Download SVG icon from http://tabler-icons.io/i/chevron-left -->
+  <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M15 6l-6 6l6 6" /></svg>`,
+        nextMonth: `<!-- Download SVG icon from http://tabler-icons.io/i/chevron-right -->
+  <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M9 6l6 6l-6 6" /></svg>`,
+      },
+    }));
+  });
+  // @formatter:on
+</script>
+<script>
+  // @formatter:off
+  document.addEventListener("DOMContentLoaded", function () {
+    window.Litepicker && (new Litepicker({
+      element: document.querySelectorAll('#datepicker-inline'),
+      buttonText: {
+        previousMonth: `<!-- Download SVG icon from http://tabler-icons.io/i/chevron-left -->
+  <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M15 6l-6 6l6 6" /></svg>`,
+        nextMonth: `<!-- Download SVG icon from http://tabler-icons.io/i/chevron-right -->
+  <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M9 6l6 6l-6 6" /></svg>`,
+      },
+      inlineMode: true,
+    }));
+  });
+  // @formatter:on
+</script>
+{% endblock content %}
+

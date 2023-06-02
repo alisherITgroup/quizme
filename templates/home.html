@@ -1,0 +1,132 @@
+{% extends "base.html" %}
+{% load static %}
+{% block content %}
+
+{% if not user.is_authenticated and generated == False %}
+<div class="row">
+    {% if error %}
+    <span class="alert alert-danger">{{error}}</span>
+{% endif %}
+</div>
+<div class="card mb-3 mt-3">
+    <div class="card-body">
+        <div class="badge bg-indigo fs-3" data-demo-color>Create your test account</div> <hr>
+        <form method="post">
+            {% csrf_token %}
+            <div class="row">
+                <div class="col-md-6 mt-1">
+                    <label for="f_name">First name</label>
+                    <input type="text" name="f_name" id="f_name" class="form-control" required>
+                </div>
+                <div class="col-md-6 mt-1">
+                    <label for="l_name">Last name</label>
+                    <input type="text" name="l_name" id="l_name" class="form-control" required>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-6 mt-1">
+                    <label for="phone">Phone number</label>
+                    <input type="text" name="phone" id="phone" class="form-control" data-mask="+998-00-000-00-00" data-mask-visible="true" placeholder="00/00/0000"autocomplete="off" required>
+                </div>
+                <div class="col-md-6 mt-1">
+                    <label for="email">Email</label>
+                    <input type="email" name="email" id="email" class="form-control" required>
+                </div>
+            </div><br>
+            <div class="d-flex justify-content-end">
+                <button class="btn btn-outline-blue" type="submit">Register</button>
+            </div>
+        </form>
+    </div>
+</div>
+{% elif generated == True %}
+    <div class="card mt-3 mb-3">
+        <div class="card-body">
+            <span class="badge bg-green fs-3">Test account created successfully!</span> <br>
+            <span class="text-danger fs-1">
+                A username and password have been created for you to log in.
+                Log in with the username and password below.
+                !!!(Do not share this information with anyone.) <br></span>
+            <label for="username">Username</label>
+            <input type="text" name="username" value="{{username}}" disabled class="form-control"> <br>
+            <label for="password">Password</label>
+            <input type="text" name="password" value="{{password}}" disabled class="form-control">
+            <span class="text-info fs-1">Copy the username and password and log in using <a href="{% url 'login' %}">login</a>.</span>
+        </div>
+    </div>
+{% endif %}
+{% if user.is_authenticated %}
+<div class="row">
+    {% for quiz in quizzes %}
+    <div class="card h-100">
+        <div class="card-header">
+          <div>
+            <div class="row align-items-center">
+              <div class="col-auto">
+                <span class="avatar" style="background-image: url(./static/avatars/003m.jpg)"></span>
+              </div>
+              <div class="col">
+                <div class="card-title">{{quiz.name}}</div>
+                <div class="card-subtitle">{{quiz.author.username}}</div>
+              </div>
+            </div>
+          </div>
+          <div class="card-actions">
+            <div class="dropdown">
+              <a href="#" class="btn-action dropdown-toggle" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><!-- Download SVG icon from http://tabler-icons.io/i/dots-vertical -->
+                <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M12 12m-1 0a1 1 0 1 0 2 0a1 1 0 1 0 -2 0" /><path d="M12 19m-1 0a1 1 0 1 0 2 0a1 1 0 1 0 -2 0" /><path d="M12 5m-1 0a1 1 0 1 0 2 0a1 1 0 1 0 -2 0" /></svg>
+              </a>
+              <div class="dropdown-menu dropdown-menu-end">
+                <a class="dropdown-item" href="{% url 'results' quiz.token %}">Results</a>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="card-body">
+          <span class="text-primary fw-bold">Type: </span> 
+            {% if quiz.type == "private" %}
+            <span class="text-danger">{{quiz.type}} </span>
+            {% else %}
+            <span class="text-success">{{quiz.type}} </span>
+            {% endif %}
+          <br>
+          <span class="text-info">Description:</span> {{quiz.description|safe}}
+          <ul>
+            <li>Participants: {{quiz.count_users}}</li>
+            <li>Questions: {{quiz.count_questions}}</li>
+          </ul>
+          <div class="d-flex justify-content-center">
+            <a href="{% url 'test' quiz.token %}" class="btn btn-outline-primary">Start &nbsp;  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-arrow-right" viewBox="0 0 16 16"> <path fill-rule="evenodd" d="M1 8a.5.5 0 0 1 .5-.5h11.793l-3.147-3.146a.5.5 0 0 1 .708-.708l4 4a.5.5 0 0 1 0 .708l-4 4a.5.5 0 0 1-.708-.708L13.293 8.5H1.5A.5.5 0 0 1 1 8z"/> </svg></a>
+          </div>
+        </div>
+    </div> <hr>
+    {% endfor %}
+</div>
+<div class="card mt-3 mb-3">
+    <div class="card-body">
+        <div id="chart">
+        </div>
+    </div>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
+<script>
+    var options = {
+    chart: {
+        type: 'line'
+    },
+    series: [{
+        name: 'Score',
+        data: [{% for rating in ratings %}{{rating.score}}, {% endfor %}]
+    }],
+    xaxis: {
+        categories: [{% for rating in ratings %}{{rating.id}}, {% endfor %}],
+        title: "a"
+    }
+    }
+
+    var chart = new ApexCharts(document.querySelector("#chart"), options);
+
+    chart.render();
+</script>
+{% endif %}
+{% endblock content %}

@@ -1,0 +1,151 @@
+{% load static %}
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"/>
+    <meta http-equiv="X-UA-Compatible" content="ie=edge"/>
+    <title>{{quiz.name}}</title>
+    <!-- CSS files -->
+    <link href="{% static 'dist/css/tabler.min.css' %}" rel="stylesheet"/>
+    <link href="{% static 'dist/css/tabler-flags.min.css' %}" rel="stylesheet"/>
+    <link href="{% static 'dist/css/tabler-payments.min.css' %}" rel="stylesheet"/>
+    <link href="{% static 'dist/css/tabler-vendors.min.css' %}" rel="stylesheet"/>
+    <link href="{% static 'dist/css/demo.min.css' %}" rel="stylesheet"/>
+    <style>
+      @import url('https://rsms.me/inter/inter.css');
+      :root {
+      	--tblr-font-sans-serif: 'Inter Var', -apple-system, BlinkMacSystemFont, San Francisco, Segoe UI, Roboto, Helvetica Neue, sans-serif;
+      }
+      body {
+      	font-feature-settings: "cv03", "cv04", "cv11";
+      }
+    </style>
+  </head>
+  <body  class=" d-flex flex-column">
+    <script src="{% static 'dist/js/demo-theme.min.js' %}"></script>
+    <div class="page">
+      <div class="container mt-3 mb-3">
+        <div class="row justify-content-center">
+            <div class="col-lg-10 col-xl-9">
+                <div class="card card-lg">
+                    <div class="card-body markdown">
+                        <div class="d-flex justify-content-end">
+                            <a href="?theme=dark" class="nav-link px-0 hide-theme-dark" title="Enable dark mode" data-bs-toggle="tooltip"
+                            data-bs-placement="bottom">
+                                    <!-- Download SVG icon from http://tabler-icons.io/i/moon -->
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M12 3c.132 0 .263 0 .393 0a7.5 7.5 0 0 0 7.92 12.446a9 9 0 1 1 -8.313 -12.454z" /></svg>
+                                </a>
+                                <a href="?theme=light" class="nav-link px-0 hide-theme-light" title="Enable light mode" data-bs-toggle="tooltip"
+                            data-bs-placement="bottom">
+                                    <!-- Download SVG icon from http://tabler-icons.io/i/sun -->
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M12 12m-4 0a4 4 0 1 0 8 0a4 4 0 1 0 -8 0" /><path d="M3 12h1m8 -9v1m8 8h1m-9 8v1m-6.4 -15.4l.7 .7m12.1 -.7l-.7 .7m0 11.4l.7 .7m-12.1 -.7l-.7 .7" /></svg>
+                                </a>&nbsp;&nbsp;
+                                <span class="nav-item ">00:00:00</span> &nbsp;&nbsp;
+                                <div class="nav-item dropdown">
+                                    <a href="#" class="nav-link d-flex lh-1 text-reset p-0" data-bs-toggle="dropdown" aria-label="Open user menu">
+                                        <div class="d-none d-xl-block ps-2">
+                                            <div>Eng</div>
+                                        </div>
+                                        <div class="dropdown-menu dropdown-menu-end dropdown-menu-arrow">
+                                            <a href="?lang=en" class="dropdown-item">Eng</a>
+                                            <a href="?lang=uz" class="dropdown-item">Uzb</a>
+                                            <a href="?lang=ru" class="dropdown-item">Rus</a>
+                                          </div>
+                                    </a>
+                                </div>
+                        </div>
+                        <style>
+                            p{
+                                display: inline;
+                            }
+                        </style>
+                        <h1>{{quiz.name}}</h1>
+                        {% if rating %}
+                        <span class="badge bg-green fs-2">You have passed this test.</span> <hr>
+                        Your score is: <span class="badge bg-blue-lt">{{rating.score}}%</span> <br>
+                        {% for case in cases %}
+                            {{forloop.counter}}. {{case}} <br>
+                        {% endfor %}
+                        {% else %}
+                        <form method="post">
+                            {% csrf_token %}
+                            {% for question in questions %}
+                        {{ forloop.counter }}. {{question.question|safe}} <br> <br>
+                        <div class="form-selectgroup-boxes row mb-3">
+                            <div class="col-lg-6">
+                              <label class="form-selectgroup-item">
+                                <input type="radio" name="answer{{forloop.counter}}" value="{{question.answer1}}" class="form-selectgroup-input" required>
+                                <span class="form-selectgroup-label d-flex align-items-center p-3">
+                                  <span class="me-3">
+                                    <span class="form-selectgroup-check"></span>
+                                  </span>
+                                  <span class="form-selectgroup-label-content">
+                                    <span class="form-selectgroup-title strong mb-1">a</span>
+                                    <span class="d-block text-muted">{{question.answer1}}</span>
+                                  </span>
+                                </span>
+                              </label> <br>
+                            </div>
+                            <div class="col-lg-6">
+                              <label class="form-selectgroup-item">
+                                <input type="radio" name="answer{{forloop.counter}}" value="{{question.answer2}}" class="form-selectgroup-input" required>
+                                <span class="form-selectgroup-label d-flex align-items-center p-3">
+                                  <span class="me-3">
+                                    <span class="form-selectgroup-check"></span>
+                                  </span>
+                                  <span class="form-selectgroup-label-content">
+                                    <span class="form-selectgroup-title strong mb-1">b</span>
+                                    <span class="d-block text-muted">{{question.answer2}}</span>
+                                  </span>
+                                </span>
+                              </label> <br>
+                            </div> 
+                            <div class="col-lg-6">
+                                <label class="form-selectgroup-item">
+                                  <input type="radio" name="answer{{forloop.counter}}" value="{{question.answer3}}" class="form-selectgroup-input" required>
+                                  <span class="form-selectgroup-label d-flex align-items-center p-3">
+                                    <span class="me-3">
+                                      <span class="form-selectgroup-check"></span>
+                                    </span>
+                                    <span class="form-selectgroup-label-content">
+                                      <span class="form-selectgroup-title strong mb-1">c</span>
+                                      <span class="d-block text-muted">{{question.answer3}}</span>
+                                    </span>
+                                  </span>
+                                </label> <br>
+                              </div>
+                              <div class="col-lg-6">
+                                <label class="form-selectgroup-item">
+                                  <input type="radio" name="answer{{forloop.counter}}" value="{{question.answer4}}" class="form-selectgroup-input" required>
+                                  <span class="form-selectgroup-label d-flex align-items-center p-3">
+                                    <span class="me-3">
+                                      <span class="form-selectgroup-check"></span>
+                                    </span>
+                                    <span class="form-selectgroup-label-content">
+                                      <span class="form-selectgroup-title strong mb-1">d</span>
+                                      <span class="d-block text-muted">{{question.answer4}}</span>
+                                    </span>
+                                  </span>
+                                </label>
+                              </div>
+                        </div>
+                        <hr>
+                        {% endfor %}
+                        <div class="d-flex justify-content-end">
+                            <button class="btn btn-info" type="submit">Send</button>
+                        </div>
+                        </form>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+      </div>
+    </div>
+    <!-- Libs JS -->
+    <!-- Tabler Core -->
+    <script src="{% static 'dist/js/tabler.min.js' %}" defer></script>
+    <script src="{% static 'dist/js/demo.min.js' %}" defer></script>
+  </body>
+</html>
